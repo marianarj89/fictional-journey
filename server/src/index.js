@@ -23,12 +23,6 @@ mongoose
   .connect(mongodbUri)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Failed to connect to MongoDB', err));
-  console.log(mongodbUri, mongodbUser, mongodbPassword)
-  
 
-// mongoose
-//     .connect("mongodb+srv://marianarj89:tjKUs4Xnirc3q4Vc@cluster0.49q2peh.mongodb.net/Cluster0?retryWrites=true&w=majority&appName=Cluster0")
-//     .then(() => console.log("Conectado ao MongoDB"))
-//     .catch((err) => console.log("Erro ao conectar ao MongoDB", err));
 
 app.listen(3001, () => console.log("SERVIDOR RODANDO NA PORTA: 3001"));
