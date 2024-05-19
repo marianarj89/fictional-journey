@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import UserModel from "../models/Users.js";
 import dotenv from "dotenv";
 
+dotenv.config();
 const loginSecret = process.env.LOGIN_SECRET;
 
 const router = express.Router();
@@ -28,24 +29,43 @@ router.post("/cadastro", async (req, res) => {
   res.json({ message: "Usuário criado com sucesso" });
 });
 
+
 //ROTA LOGIN
 
 router.post("/login", async (req, res) => {
-  const { username, email, password } = req.body;
-  const usuario = await UserModel.findOne({ username });
+  const { username, password } = req.body;
 
-  if (!usuario) {
-    return res.status(400).json({ message: "Usuário não encontrado" });
+  const user = await UserModel.findOne({ username });
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ message: "usuário ou senha incorretos" });
   }
-
-  const checkPassword = await bcrypt.compare(password, usuario.password);
-
-  if (!checkPassword) {
-    return res.status(400).json({ message: "Senha inválida" });
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    return res
+      .status(400)
+      .json({ message: "usuário ou senha incorretos" });
   }
-
-  const token = jwt.sign({ id: usuario._id }, loginSecret);
-  res.json({ token, userID: usuario._id });
+  const token = jwt.sign({ id: user._id }, loginSecret);
+  res.json({ token, userID: user._id });
 });
+
+export { router as userRouter };
+
+export const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    jwt.verify(authHeader, loginSecret, (err) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+      next();
+    });
+  } else {
+    res.sendStatus(401);
+  }
+};
 
 export { router as usersRouter };

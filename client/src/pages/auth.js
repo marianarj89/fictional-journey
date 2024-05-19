@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-
+import axios from "axios";
+import { useCookies } from "react-cookie";
+import { useNavigate } from 'react-router-dom';
 
 function Auth() {
   return (
     <div className="auth">
-      {/* <Login /> */}
+      <Login />
       <Cadastro />
     </div>
   );
@@ -13,22 +15,46 @@ function Auth() {
 
 export default Auth;
 
-// //componente Login
-// const Login = () => {
-//   const [username, setUsername] = useState("");
-//   const [password, setPassword] = useState("");
+// Componente Login
+const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [cookie, setCookies] = useCookies(["access_token"]);
+  const navigate = useNavigate();
 
-//   return (
-//     <div className="container-cadastro">
-//       <Form 
-//         username={username} setUsername={setUsername} password={password} setPassword={setPassword} label="Login"
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:3001/auth/login", {
+        username,
+        password,
+      });
+      setCookies("access_token", response.data.token);
+      window.localStorage.setItem("userID", response.data.userID);
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed:", error.response ? error.response.data : error.message);
+      alert(error.response ? error.response.data.message : "Login failed. Please try again.");
+    }
+  };
 
-//         />
-//     </div>
-//   );
-// };
+  return (
+    <div className="container-login">
+      <Form
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+        label="Login"
+        usernameId="login-username"
+        passwordId="login-password"
+        onSubmit={onSubmit}
+      />
+    </div>
+  );
+};
 
-//componente Cadastro
+// Componente Cadastro
 const Cadastro = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -36,50 +62,59 @@ const Cadastro = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const response = await fetch("http://localhost:3001/auth/cadastro", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-        email,
-      }),
-      alert: "Cadastrado com sucesso! Agora faça o login.",
-    });
-    const data = await response.json();
-    console.log(data);
-  }
+    try {
+      const response = await fetch("http://localhost:3001/auth/cadastro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (response.ok) {
+        alert("Cadastrado com sucesso! Agora faça o login.");
+      } else {
+        alert(data.message || "Cadastro failed!");
+      }
+    } catch (error) {
+      console.error("Cadastro failed:", error);
+      alert("Cadastro failed. Please try again.");
+    }
+  };
 
   return (
     <div className="container-cadastro">
       <h2>Faça seu cadastro</h2>
       <div className="form-group">
         <form onSubmit={onSubmit}>
-          <label htmlFor="username">Nome:</label>
+          <label htmlFor="cadastro-username">Nome:</label>
           <br />
           <input
             type="text"
-            id="username"
+            id="cadastro-username"
             onChange={(event) => setUsername(event.target.value)}
           />
           <br />
           <br />
-          <label htmlFor="email">Email:</label>
+          <label htmlFor="cadastro-email">Email:</label>
           <br />
           <input
             type="email"
-            id="email"
+            id="cadastro-email"
             onChange={(event) => setEmail(event.target.value)}
           />
           <br />
           <br />
-          <label htmlFor="password">Senha:</label>
+          <label htmlFor="cadastro-password">Senha:</label>
           <br />
           <input
             type="password"
-            id="password"
+            id="cadastro-password"
             onChange={(event) => setPassword(event.target.value)}
           />
           <br />
@@ -91,26 +126,37 @@ const Cadastro = () => {
   );
 };
 
-const Form = ({ username, setUsername, password, setPassword, label }) => {
+const Form = ({
+  username,
+  setUsername,
+  password,
+  setPassword,
+  label,
+  usernameId,
+  passwordId,
+  onSubmit,
+}) => {
   return (
     <div className="container-cadastro">
-      <h2>Faça seu cadastro</h2>
+      <h2>{label}</h2>
       <div className="form-group">
-        <form>
-          <label htmlFor="username">Nome:</label>
+        <form onSubmit={onSubmit}>
+          <label htmlFor={usernameId}>Nome:</label>
           <br />
           <input
             type="text"
-            id="username"
+            id={usernameId}
+            value={username}
             onChange={(event) => setUsername(event.target.value)}
           />
           <br />
           <br />
-          <label htmlFor="password">Senha:</label>
+          <label htmlFor={passwordId}>Senha:</label>
           <br />
           <input
             type="password"
-            id="password"
+            id={passwordId}
+            value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
           <br />

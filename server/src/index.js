@@ -21,8 +21,8 @@ app.use("/auth", usersRouter);
 
 mongoose
   .connect(mongodbUri)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('Failed to connect to MongoDB', err));
+  .then(() => console.log('Connectado ao MongoDB'))
+  .catch(err => console.error('Erro ao conectar ao MongoDB', err));
 
 
 app.listen(3001, () => console.log("SERVIDOR RODANDO NA PORTA: 3001"));
