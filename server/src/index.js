@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { usersRouter } from "./routes/users.js";
+import { receitasRouter } from "./routes/receitas.js";
 
 const app = express();	
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/auth", usersRouter);
+app.use("/receitas", receitasRouter);
 
 mongoose
   .connect(mongodbUri)

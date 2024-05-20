@@ -3,11 +3,23 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import UserModel from "../models/Users.js";
 import dotenv from "dotenv";
+import fs from "fs";
 
 dotenv.config();
 const loginSecret = process.env.LOGIN_SECRET;
 
 const router = express.Router();
+
+const logToFile = (message) => {
+  const logFilePath = path.join(__dirname, "userActivity.log");
+  const logMessage = `${new Date().toISOString()} - ${message}\n`;
+  fs.appendFile(logFilePath, logMessage, (err) => {
+    if (err) {
+      console.error("Ocorreu um erro ao gravar o log:", err);
+    }
+  });
+};
+
 
 //http://localhost:3001/auth/cadastro POST
 

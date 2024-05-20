@@ -13,8 +13,15 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    receitasSalvas: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "receitas"
+        }
+    ]
 });
 
 const UserModel = mongoose.model("usuarios", UserSchema);
+
 export default UserModel
